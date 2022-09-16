@@ -6,9 +6,9 @@ commands:
   notify_on_failure :
          steps:
            - slack/notify:   
-                event:fail
-                channel:cicd-pipelines
-                template:basic_fail_1     
+                event: fail
+                channel: cicd-pipelines
+                template: basic_fail_1     
 jobs:
   build-frontend:
     docker:
@@ -116,9 +116,9 @@ notify_on_success:
     -image:cimg/ase
   steps:
     -slack/notify:
-        event:pass
-        channel:cicd-pipelines
-        template:success_tagged_deployment_1      
+        event: pass
+        channel: cicd-pipelines
+        template: success_tagged_deployment_1      
       
 workflows:
   default:

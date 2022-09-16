@@ -1,7 +1,6 @@
 version: 2.1   
 orbs:
   slack: circleci/slack@4.9.3
-  
 commands:
   notify_on_failure :
     steps:
@@ -112,15 +111,13 @@ jobs:
            npm audit --audit-level=critical
        - notify_on_failure
   notify_on_success:
-     docker:
-        -image:cimg/ase
-     steps:
-	 -slack/notify:
-	    event: pass
-	    channel: cicd-pipelines
-	    template: success_tagged_deployment_1      
-	    
-      
+    docker:
+     -image:cimg/base
+    steps:
+     -slack/notify:
+       event: pass
+       channel: cicd-pipelines
+       template: success_tagged_deployment_1
 workflows:
   default:
     jobs:

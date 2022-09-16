@@ -1,6 +1,4 @@
-version: 2.1
-
-            
+version: 2.1            
 jobs:
   build-frontend:
     docker:
@@ -18,7 +16,6 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-deps
-
   build-backend:
     docker:
       - image: cimg/node:13.8.0
@@ -34,10 +31,8 @@ jobs:
            npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-deps
-          
-       
-    test-frontend:
+          key: backend-deps    
+    testing-frontend:
       docker:
        - image: cimg/node:13.8.0
       steps:
@@ -49,9 +44,8 @@ jobs:
           command: |
            cd frontend
            npm install 
-           npm test
-           
-    test-backend:
+           npm test           
+    testing-backend:
       docker:
        - image: cimg/node:13.8.0
       steps:
@@ -63,15 +57,13 @@ jobs:
           command: |
            cd backend
            npm install 
-           npm test   
-            
+           npm test               
 workflows:
   default:
     jobs:
       - build-frontend
       - build-backend
-      - test-frontend:
+      - testing-frontend:
           requires: [build-frontend]          
-      - test-backend:
+      - testing-backend:
           requires: [build-backend]
-      

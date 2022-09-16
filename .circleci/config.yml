@@ -111,14 +111,15 @@ jobs:
            npm audit fix --force --audit-level=critical
            npm audit --audit-level=critical
        - notify_on_failure
-notify_on_success:
-  docker:
-    -image:cimg/ase
-  steps:
-    -slack/notify:
-        event: pass
-        channel: cicd-pipelines
-        template: success_tagged_deployment_1      
+  notify_on_success:
+     docker:
+        -image:cimg/ase
+     steps:
+	 -slack/notify:
+	    event: pass
+	    channel: cicd-pipelines
+	    template: success_tagged_deployment_1      
+	    
       
 workflows:
   default:

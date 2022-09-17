@@ -112,21 +112,14 @@ jobs:
        - notify_on_failure
   notify_on_success:
     docker:
-<<<<<<< HEAD
      - image: 'cimg/base:stable'
     steps:
      - slack/notify:
        event: pass
        channel: cicd-pipelines
        template: success_tagged_deployment_1
-=======
-     - image: cimg/base
-    steps:
-     - slack/notify:
-        event: pass
-        channel: cicd-pipelines
-        template: success_tagged_deployment_1
->>>>>>> 5a40ecaaaaea496c9b0b29b7e0cc82e5c54e87f5
+       
+       
 workflows:
   default:
     jobs:
@@ -146,6 +139,8 @@ workflows:
             - build-backend
             - test-frontend
             - test-backend
+            
+  ###EF          
       
       
       

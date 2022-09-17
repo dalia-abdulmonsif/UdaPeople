@@ -115,9 +115,9 @@ jobs:
      - image: 'cimg/base:stable'
     steps:
      - slack/notify:
-       event: pass
-       channel: cicd-pipelines
-       template: success_tagged_deployment_1
+        event: pass
+        channel: cicd-pipelines
+        template: success_tagged_deployment_1
        
        
 workflows:
@@ -139,8 +139,7 @@ workflows:
             - build-backend
             - test-frontend
             - test-backend
-            
-  ###EF          
+                      
       
       
       

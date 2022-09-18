@@ -164,7 +164,6 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}"  
-              exit 1
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -173,7 +172,6 @@ jobs:
               --tags project=your-tag \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" 
-              exit 1
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -188,7 +186,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
 
-            
+
       - destroy-environment
       
       # Here's where you will add some code to rollback on failure      

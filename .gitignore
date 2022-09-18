@@ -65,6 +65,10 @@ $RECYCLE.BIN/
 Thumbs.db
 UserInterfaceState.xcuserstate
 node_modules
-
+.env
+.keys*
+pkey*
+xt*
 .env
 dist
+.keys*

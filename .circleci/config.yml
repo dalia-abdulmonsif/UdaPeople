@@ -210,7 +210,7 @@ jobs:
         - checkout 
         - ansible_install
         - add_ssh_keys:
-            fingerprints: "cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"
+             fingerprints: 'cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e'
         - attach_workspace:
              at: ~/
         - run: 
@@ -280,7 +280,7 @@ jobs:
 
     deploy-backend:
         docker:
-          -image: cimg/base:stable
+           - image: cimg/base:stable
         steps:
           - checkout
           - awscli_install
@@ -293,8 +293,8 @@ jobs:
           - run:
               name: Install dependencies
               command: |
-               cd backend
-               npm install 
+                  cd backend
+                  npm install 
           - run:
               name: Package backend
               command: |
@@ -317,7 +317,7 @@ jobs:
    
     smoke-test-backend:
         docker:
-          -image: cimg/base:stable
+          - image: cimg/base:stable
         steps:
           - checkout
           - attach_workspace:
@@ -325,20 +325,20 @@ jobs:
           - run:
               name: Install dependencies
               command: |
-                apk add --update curl
-                pip install awscli
+                  apk add --update curl
+                  pip install awscli
           - run:
               name: Backend smoke test
               command: |
-                 BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-                 API_URL="http://${BACKEND_IP}:3030"
-                 curl "${API_URL}/api/status"
+                  BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+                  API_URL="http://${BACKEND_IP}:3030"
+                  curl "${API_URL}/api/status"
 
 
 
     smoke-test-frontend:
         docker:
-          -image: cimg/base:stable
+          - image: cimg/base:stable
         steps:
           - checkout
           - attach_workspace:

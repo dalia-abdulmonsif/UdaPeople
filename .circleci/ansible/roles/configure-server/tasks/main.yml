@@ -10,6 +10,11 @@
     name: ["nodejs"]
     state: latest
     update_cache: yes
+    force: yes
+  with_items:
+    - nodejs
+    - npm
+  become: yes
 
 - name: "Install PM2 Globally"
   npm: 

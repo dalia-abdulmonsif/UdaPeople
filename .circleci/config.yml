@@ -17,6 +17,26 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
             aws s3 rm s3://udapeople-<< parameters.Workflow_ID >> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
+ 
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      Workflow_ID:
+        type: string  
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            SUCCESS = $(curl --insecure https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
+            if(( $SUCCESS==1 )); 
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+            fi
+ 
+ 
   awscli_install :
    description: Install AWS CLI V2
    steps:
@@ -206,6 +226,145 @@ jobs:
                ansible-playbook -i inventory.txt configure-server.yml                         
         - destroy-environment
 
+
+  run-migrations:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - awscli_install
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install 
+            npm run migrations > migrations_dump.txt
+      - run:
+          name: Send migration results to kvdb.io
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID} -d '1'
+            fi
+      - destroy-environment
+      - revert-migrations    
+
+ #KL48reMyYUBPYTrg4gYseg
+
+  deploy-frontend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - awscli_install
+      - restore_cache:
+          keys: [frontend-deps]
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install 
+      - run:
+          name: Get backend url
+          command: |
+             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID}" \
+            --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
+            export API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm run build
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
+
+    - destroy-environment
+    - revert-migrations                 
+
+
+  deploy-backend:
+    docker:
+      -image: cimg/base:stable
+    steps:
+      - checkout
+      - awscli_install
+      - add_ssh_keys:
+            fingerprints: "cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"
+      - attach_workspace:
+             at: ~/
+      - restore_cache:
+          keys: [backend-deps]       
+      - run:
+          name: Install dependencies
+          command: |
+           cd backend
+           npm install 
+      - run:
+          name: Package backend
+          command: |
+            cd backend
+            npm run build
+            tar -czf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+          command: |
+            export TYPEORM_MIGRATIONS_DIR=./migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity(.ts,.js)
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+    - destroy-environment
+    - revert-migrations   
+   
+  smoke-test-backend:
+    docker:
+      -image: cimg/base:stable
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl
+            pip install awscli
+      - run:
+          name: Backend smoke test
+          command: |
+             BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+             API_URL="http://${BACKEND_IP}:3030"
+             curl "${API_URL}/api/status"
+
+
+
+  smoke-test-frontend:
+    docker:
+      -image: cimg/base:stable
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update curl
+            pip install awscli
+      - run:
+          name: Smoke test for front end
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website-us-west-2.amazonaws.com"             
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              exit 0
+            else
+              exit 1
+            fi           
+
   notify_on_success:
     docker:
      - image: 'cimg/base:stable'
@@ -234,7 +393,17 @@ workflows:
             branches:
               only: [main]   
       - configure-infrastructure:
-          requires: [deploy-infrastructure]         
+          requires: [deploy-infrastructure]    
+      - run-migrations:
+          requires: [configure-infrastructure]    
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]   
+      - smoke-test-backend:
+          requires: [deploy-backend]
+      - smoke-test-frontend:
+          requires: [deploy-frontend]      
       - notify_on_success:
           requires:
             - build-frontend
@@ -243,8 +412,7 @@ workflows:
             - test-backend     
             - deploy-infrastructure  
             - configure-infrastructure             
-  
-      
-      
-      
+            - run-migrations
+            - deploy-backend
+            - deploy-frontend
 

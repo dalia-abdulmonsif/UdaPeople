@@ -177,7 +177,7 @@ jobs:
           command: |
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID}" \
-            --output text --query "Reservations[*].Instances[*].PublicIpAddress")
+            --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
             echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt
       - persist_to_workspace:
@@ -185,10 +185,26 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
 
-
       - destroy-environment
-      
-      # Here's where you will add some code to rollback on failure      
+
+
+  configure-infrastructure:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - checkout 
+        - ansible_install
+        - add_ssh_keys:
+            fingerprints: "cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"
+        - attach_workspace:
+             at:~/
+        - run: 
+            name: Configure Server
+            command: |
+               cd .circleci/ansible
+               cat inventory.txt
+               ansible-playbook -i inventory.txt configure-server.yml                         
+        - destroy-environment
 
   notify_on_success:
     docker:
@@ -198,8 +214,7 @@ jobs:
         event: pass
         channel: cicd-pipelines
         template: success_tagged_deployment_1
-       
-       
+  
 workflows:
   default:
     jobs:
@@ -217,14 +232,17 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [main]    
+              only: [main]   
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]         
       - notify_on_success:
           requires:
             - build-frontend
             - build-backend
             - test-frontend
             - test-backend     
-            - deploy-infrastructure               
+            - deploy-infrastructure  
+            - configure-infrastructure             
   
       
       

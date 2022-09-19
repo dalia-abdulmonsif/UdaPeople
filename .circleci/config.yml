@@ -234,6 +234,9 @@ jobs:
               command: |
                 cd backend
                 node -v 
+                sudo npm install typescript@latest -g
+                tsc --init
+                tsc --version
                 npm run migrations > migrations_dump.txt
           - run:
               name: Send migration results to kvdb.io

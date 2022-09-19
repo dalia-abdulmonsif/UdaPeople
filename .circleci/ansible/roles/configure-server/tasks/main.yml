@@ -1,23 +1,26 @@
+  - hosts: all
+    gather_facts: yes
+    become: yes
+    vars:
+      NODEJS_VERSION: "13"
+      ansible_distribution_release: "xenial" #trusty
+    tasks:
+      - name: Install the gpg key for nodejs LTS
+          apt_key:
+            url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+          state: present
 
-- name: "Add Node.js from Node source"
-  become: true
-  shell: |
-     curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+      - name: Install the nodejs LTS repos
+          apt_repository:
+            repo: "deb https://deb.nodesource.com/node_{{ NODEJS_VERSION }}.x {{ ansible_distribution_release }} main"
+          state: present
+          update_cache: yes
 
-- name: "Install Node.js 13"
-  become: true
-  apt:
-    name: ["nodejs"]
-    state: latest
-    update_cache: yes
-    force: yes
-  with_items:
-    - nodejs
-    - npm
-  become: yes
-
-- name: "Install PM2 Globally"
-  npm: 
-    name: pm2
-    global: yes
- 
+      - name: Install the nodejs
+        apt:
+          name: nodejs
+          state: present  
+      - name: "Install PM2 Globally"
+        npm: 
+          name: pm2
+          global: yes

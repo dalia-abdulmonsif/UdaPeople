@@ -305,7 +305,7 @@ jobs:
 
     deploy-backend:
         docker:
-          - image: cimg/base:stable
+          - image: cimg/base:2022.06
             environment:
               NODE_ENV: "production"
               VERSION: "2"
@@ -330,29 +330,39 @@ jobs:
                  at: ~/
           - restore_cache:
               keys: [backend-deps]       
-          - run:
-              name: Install dependencies
+           - run:
+              name: Create the  .env file
               command: |
-                  cd backend
-                  npm install 
+                cd backend
+                touch .env
+                echo "TYPEORM_HOST=${TYPEORM_HOST}"  >> .env
+                echo "TYPEORM_PORT=${TYPEORM_PORT}" >> .env
+                echo "TYPEORM_USERNAME=${TYPEORM_USERNAME}" >> .env
+                echo "TYPEORM_PASSWORD=${TYPEORM_PASSWORD}" >> .env
+                echo "TYPEORM_DATABASE=${TYPEORM_DATABASE}" >> .env
+                echo "TYPEORM_CONNECTION=postgres" >> .env
+                echo "TYPEORM_MIGRATIONS_DIR=./src/migrations" >> .env
+                echo "TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts" >> .env
+                echo "TYPEORM_MIGRATIONS=./src/migrations/*.ts" >> .env
+                cat .env
           - run:
-              name: Package backend
+              name: Deploy Our backend
               command: |
-                    cd backend
-                    npm install
-                    npm run build
-                    cd ..
-                    tar -C backend -czvf artifact.tar.gz .
-                    cp artifact.tar.gz .circleci/ansible/roles/deploy/files    
-          - run:
-              name: Deploy backend
-              command: |
-                  export TYPEORM_MIGRATIONS_DIR=./migrations
-                  export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-                  export TYPEORM_MIGRATIONS=./migrations/*.ts                  
-                  cd .circleci/ansible
-                  cat inventory.txt
-                  ansible-playbook -i inventory.txt deploy-backend.yml
+                cd backend
+                npm i
+                npm run build
+                # tar -czf artifact.tar.gz .
+                cd ..
+                # enter backend directory and Zip the directory
+                tar -C backend -czf artifact.tar.gz .
+                cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
+                # ls ~/project/.circleci/ansible/roles/deploy/files/
+                echo "Present working directory is -------"
+                cd .circleci/ansible
+                echo "Contents  of the inventory.txt file is -------"
+                cat inventory.txt
+                ansible-playbook -i inventory.txt deploy-backend.yml
+              no_output_timeout: 30m
 
           - destroy-environment
           - revert-migrations   

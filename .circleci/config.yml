@@ -232,7 +232,6 @@ jobs:
               keys:
                 - backend-deps
 
-          - awscli_install
           - run:
               name: Run migrations
               command: |

@@ -351,8 +351,8 @@ jobs:
                   ansible-playbook -i inventory.txt deploy-backend.yml
                 no_output_timeout: 30m
 
-        - destroy-environment
-        - revert-migrations   
+             - destroy-environment
+             - revert-migrations   
    
     smoke-backend-test:
         docker:

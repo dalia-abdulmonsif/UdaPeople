@@ -222,7 +222,7 @@ jobs:
 
     configure-infrastructure:
       docker:
-        - image: cimg/base:stable
+        - image: cimg/base:2022.06
       steps:
         - checkout 
         - ansible_install

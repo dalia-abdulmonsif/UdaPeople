@@ -345,7 +345,7 @@ jobs:
           - image: cimg/base:stable
         steps:
           - checkout
-          - install_awscli
+          - awscli_install
           - install_nodejs
           - run:
               name: Backend smoke test.

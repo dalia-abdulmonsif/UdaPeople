@@ -185,7 +185,7 @@ jobs:
 
     deploy-infrastructure:
       docker:
-        - image: cimg/base:stable
+        - image: amazon/aws-cli
       steps:
         - checkout
         - awscli_install
@@ -271,7 +271,7 @@ jobs:
 
     deploy-frontend:
         docker:
-          - image: cimg/node:13.8.0
+          - image: python:3.7-alpine3.11
         steps:
           - checkout
           - awscli_install
@@ -304,7 +304,7 @@ jobs:
 
     deploy-backend:
         docker:
-           - image: cimg/node:13.8.0
+          - image: python:3.7-alpine3.11
         steps:
           - checkout
           - awscli_install
@@ -343,7 +343,7 @@ jobs:
    
     smoke-backend-test:
         docker:
-          - image: cimg/base:stable
+          - image: python:3.7-alpine3.11
         steps:
           - checkout
           - awscli_install
@@ -367,7 +367,7 @@ jobs:
 
     smoke-frontend-test:
         docker:
-          - image: cimg/base:stable
+          - image: python:3.7-alpine3.11
         steps:
           - checkout
           - awscli_install
@@ -387,7 +387,7 @@ jobs:
 
     cloudfront-update:
         docker:
-          - image: cimg/base:stable
+          - image: amazon/aws-cli
         steps:
           - checkout
           - awscli_install

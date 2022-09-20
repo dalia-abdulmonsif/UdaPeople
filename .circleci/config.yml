@@ -238,6 +238,7 @@ jobs:
                 tsc --init
                 tsc --version
                 npm install
+                npm audit fix
                 npm run migrations > migrations_dump.txt
           - run:
               name: Send migration results to kvdb.io

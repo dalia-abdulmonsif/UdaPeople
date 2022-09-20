@@ -185,7 +185,7 @@ jobs:
 
     deploy-infrastructure:
       docker:
-        - image: amazon/aws-cli
+        - image: cimg/base:stable
       steps:
         - checkout
         - awscli_install

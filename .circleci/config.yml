@@ -305,19 +305,18 @@ jobs:
 
     deploy-backend:
         docker:
-            - image: cimg/base:2022.06
+          - image: cimg/base:stable
         steps:
-            - checkout
-            - awscli_install
-            - install_nodejs
-            - ansible_install
-            - add_ssh_keys:
+          - checkout
+          - awscli_install
+          - install_nodejs
+          - add_ssh_keys:
                   fingerprints: "cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"
-            - attach_workspace:
+          - attach_workspace:
                   at: ~/
-            - restore_cache:
+          - restore_cache:
                 keys: [backend-deps]       
-            - run:
+          - run:
                 name: Create the  .env file
                 command: |
                     cd backend
@@ -332,7 +331,7 @@ jobs:
                     echo "TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts" >> .env
                     echo "TYPEORM_MIGRATIONS=./src/migrations/*.ts" >> .env
                     cat .env
-            - run:
+          - run:
                 name: Deploy Our backend
                 command: |
                     cd backend
@@ -349,10 +348,10 @@ jobs:
                     echo "Contents  of the inventory.txt file is -------"
                     cat inventory.txt
                     ansible-playbook -i inventory.txt deploy-backend.yml
-            no_output_timeout: 30m
+           no_output_timeout: 30m
 
-             - destroy-environment
-             - revert-migrations   
+          - destroy-environment
+          - revert-migrations   
    
     smoke-backend-test:
         docker:

@@ -363,6 +363,18 @@ jobs:
                   else
                     exit http://${BACKEND_PUBLIC_IP}:3030
                   fi
+
+
+
+
+
+    smoke-frontend-test:
+        docker:
+          - image: cimg/base:stable
+        steps:
+          - checkout
+          - awscli_install
+          - install_nodejs
           - run:
               name: Frontend smoke test.
               command: |
@@ -373,6 +385,34 @@ jobs:
                   else
                     exit 1
                   fi
+
+
+
+    cloudfront-update:
+        docker:
+          - image: cimg/base:stable
+        steps:
+          - checkout
+          - install_awscli
+          - install_nodejs
+          - run:
+              name: Save Old Workflow ID to kvdb.io
+              command: |
+                export OLD_WORKFLOW_ID=$(aws cloudformation \
+                          list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                          --no-paginate --output text)
+                echo "Old Wokflow ID: $OLD_WORKFLOW_ID"
+                curl https://kvdb.io/${KVDB_BUCKET}/old_workflow_id -d "${OLD_WORKFLOW_ID}"
+          - run:
+              name: Update cloudfront distribution
+              command: |
+                aws cloudformation deploy \
+                  --template-file .circleci/files/cloudfront.yml \
+                  --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}" \
+                  --stack-name InitialStack
+          - destroy-environment
+          - revert-migrations
+
 
     notify_on_success:
         docker:
@@ -410,7 +450,11 @@ workflows:
       - deploy-backend:
           requires: [run-migrations]   
       - smoke-test:
-          requires: [deploy-backend, deploy-frontend]   
+          requires: [deploy-backend]
+      - smoke-frontend-test:
+          requires: [deploy-frontend]       
+      - cloudfront-update:
+          requires: [smoke-test,smoke-frontend-test]    
       - notify_on_success:
           requires:
             - build-frontend

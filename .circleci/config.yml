@@ -271,7 +271,7 @@ jobs:
 
     deploy-frontend:
         docker:
-          - image: python:3.7-alpine3.11
+          - image: circleci/python:3.8.2
         steps:
           - checkout
           - awscli_install
@@ -343,7 +343,7 @@ jobs:
    
     smoke-backend-test:
         docker:
-          - image: python:3.7-alpine3.11
+          - image: alpine:latest
         steps:
           - checkout
           - awscli_install
@@ -367,7 +367,7 @@ jobs:
 
     smoke-frontend-test:
         docker:
-          - image: python:3.7-alpine3.11
+          - image: alpine:latest
         steps:
           - checkout
           - awscli_install
@@ -387,7 +387,7 @@ jobs:
 
     cloudfront-update:
         docker:
-          - image: amazon/aws-cli
+          - image: python:3.7-alpine3.11
         steps:
           - checkout
           - awscli_install
@@ -413,7 +413,7 @@ jobs:
 
     cleanup:
         docker:
-          - image: cimg/base:stable
+          - image: amazon/aws-cli
         steps:
           - checkout
           - awscli_install

@@ -416,22 +416,22 @@ workflows:
       #     requires: [deploy-infrastructure]    
       - run-migrations
           # requires: [configure-infrastructure]    
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]   
-      - smoke-test-backend:
-          requires: [deploy-backend]
-      - smoke-test-frontend:
-          requires: [deploy-frontend]      
-      - notify_on_success:
-          requires:
-            - build-frontend
-            - build-backend
-            - test-frontend
-            - test-backend     
-            - deploy-infrastructure  
-            - configure-infrastructure             
-            - run-migrations
-            - deploy-backend
-            - deploy-frontend
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]   
+      # - smoke-test-backend:
+      #     requires: [deploy-backend]
+      # - smoke-test-frontend:
+      #     requires: [deploy-frontend]      
+      # - notify_on_success:
+      #     requires:
+      #       - build-frontend
+      #       - build-backend
+      #       - test-frontend
+      #       - test-backend     
+      #       - deploy-infrastructure  
+      #       - configure-infrastructure             
+      #       - run-migrations
+      #       - deploy-backend
+      #       - deploy-frontend

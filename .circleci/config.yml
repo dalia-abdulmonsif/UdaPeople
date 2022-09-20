@@ -332,7 +332,7 @@ jobs:
                     echo "TYPEORM_MIGRATIONS_DIR=./src/migrations" >> .env
                     echo "TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts" >> .env
                     echo "TYPEORM_MIGRATIONS=./src/migrations/*.ts" >> .env
-                    cat .env
+                    sudo cat .env
 
         - run:
               name: Deploy Our backend
@@ -348,7 +348,7 @@ jobs:
                     echo "Present working directory is -------"
                     cd .circleci/ansible
                     echo "Contents  of the inventory.txt file is -------"
-                    cat inventory.txt
+                    sudo cat inventory.txt
                     ansible-playbook -i inventory.txt deploy-backend.yml
               no_output_timeout: 30m
 

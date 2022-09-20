@@ -169,7 +169,7 @@ jobs:
 
     deploy-infrastructure:
       docker:
-        - image: cimg/base:stable
+        - image: cimg/node:10.19.0
       steps:
         - checkout
         - awscli_install
@@ -206,7 +206,7 @@ jobs:
 
     configure-infrastructure:
       docker:
-        - image: cimg/base:stable
+        - image: cimg/node:10.19.0
       steps:
         - checkout 
         - ansible_install
@@ -234,11 +234,7 @@ jobs:
               command: |
                 cd backend
                 node -v 
-                sudo npm install typescript@latest -g
-                tsc --init
-                tsc --version
                 npm install
-                npm audit fix --force
                 npm run migrations > migrations_dump.txt
           - run:
               name: Send migration results to kvdb.io
@@ -286,7 +282,7 @@ jobs:
 
     deploy-backend:
         docker:
-           - image: cimg/base:stable
+           - image: cimg/node:10.19.0
         steps:
           - checkout
           - awscli_install

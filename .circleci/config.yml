@@ -275,6 +275,7 @@ jobs:
         steps:
           - checkout
           - awscli_install
+          - install_nodejs
           - restore_cache:
               keys: [frontend-deps]
           - run:
@@ -307,6 +308,7 @@ jobs:
         steps:
           - checkout
           - awscli_install
+          - install_nodejs
           - add_ssh_keys:
                 fingerprints: "cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"
           - attach_workspace:
@@ -321,11 +323,11 @@ jobs:
           - run:
               name: Package backend
               command: |
-                cd backend
-                npm run build
-                tar -czf artifact.tar.gz dist/* package*
-                cd ..
-                cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+                  cd backend
+                  npm run build
+                  tar -czf artifact.tar.gz dist/* package*
+                  cd ..
+                  cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
           - run:
               name: Deploy backend
               command: |

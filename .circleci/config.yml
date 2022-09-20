@@ -167,7 +167,7 @@ jobs:
 
     scan-backend:
         docker:
-            - image: cimg/node:13.8.0
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - restore_cache:
@@ -271,7 +271,7 @@ jobs:
 
     deploy-frontend:
         docker:
-          - image: cimg/base:2022.06
+          - image: cimg/base:stable
         steps:
           - checkout
           - awscli_install
@@ -291,6 +291,7 @@ jobs:
                   --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
                   export API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
                   cat frontend/.env
+                  echo "http://${BACKEND_IP}:3030"
           - run:
               name: Deploy frontend objects
               command: |
@@ -304,7 +305,7 @@ jobs:
 
     deploy-backend:
         docker:
-          - image: cimg/base:2022.06
+          - image: cimg/base:stable
             environment:
               NODE_ENV: "production"
               VERSION: "2"
@@ -352,7 +353,7 @@ jobs:
                   cd .circleci/ansible
                   cat inventory.txt
                   ansible-playbook -i inventory.txt deploy-backend.yml
-                  
+
           - destroy-environment
           - revert-migrations   
    

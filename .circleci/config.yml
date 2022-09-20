@@ -241,10 +241,10 @@ jobs:
 
     run-migrations:
         docker:
-          - image: circleci/node:13.8.0
+          - image: sleavely/node-awscli:14.x
         steps:
           - checkout
-          - awscli_install
+          # - awscli_install
 
           - restore_cache:
               keys:
@@ -332,7 +332,7 @@ jobs:
               name: Deploy backend
               command: |
                 export TYPEORM_MIGRATIONS_DIR=./migrations
-                export TYPEORM_ENTITIES=./modules/domain/**/*.entity(.ts,.js)
+                export TYPEORM_ENTITIES='./modules/domain/**/*.entity(.ts,.js)'
                 export TYPEORM_MIGRATIONS=./migrations/*.ts
                 cd .circleci/ansible
                 cat inventory.txt

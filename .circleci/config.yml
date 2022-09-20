@@ -185,7 +185,7 @@ jobs:
 
     deploy-infrastructure:
       docker:
-        - image: cimg/base:2022.06
+        - image: cimg/base:stable
       steps:
         - checkout
         - awscli_install
@@ -222,7 +222,7 @@ jobs:
 
     configure-infrastructure:
       docker:
-        - image: cimg/base:2022.06
+        - image: cimg/base:stable
       steps:
         - checkout 
         - ansible_install
@@ -271,7 +271,7 @@ jobs:
 
     deploy-frontend:
         docker:
-          - image: cimg/base:2022.06
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - awscli_install
@@ -304,7 +304,7 @@ jobs:
 
     deploy-backend:
         docker:
-          - image: cimg/base:2022.06
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - awscli_install
@@ -343,7 +343,7 @@ jobs:
    
     smoke-backend-test:
         docker:
-          - image: cimg/base:2022.06
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - awscli_install
@@ -367,7 +367,7 @@ jobs:
 
     smoke-frontend-test:
         docker:
-          - image: cimg/base:2022.06
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - awscli_install
@@ -413,7 +413,7 @@ jobs:
 
     cleanup:
         docker:
-          - image: amazon/aws-cli
+          - image: cimg/base:stable
         steps:
           - checkout
           - awscli_install
@@ -436,7 +436,7 @@ jobs:
 
     notify_on_success:
         docker:
-          - image: 'cimg/base:stable'
+          - image: cimg/base:stable
         steps:
           - slack/notify:
               event: pass

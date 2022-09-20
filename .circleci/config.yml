@@ -69,7 +69,7 @@ commands:
 jobs:
     build-frontend:
         docker:
-          - image: cimg/node:10.19.0
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - restore_cache:
@@ -87,7 +87,7 @@ jobs:
 
     build-backend:
         docker:
-          - image: cimg/node:10.19.0
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - restore_cache:
@@ -105,7 +105,7 @@ jobs:
           
     test-frontend:
         docker:
-          - image: cimg/node:10.19.0
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - restore_cache:
@@ -120,7 +120,7 @@ jobs:
                 
     test-backend:
       docker:
-        - image: cimg/node:10.19.0
+        - image: cimg/node:13.8.0
       steps:
       - checkout
       - restore_cache:
@@ -135,7 +135,7 @@ jobs:
    
     scan-frontend:
       docker:
-       - image: cimg/node:10.19.0
+       - image: cimg/node:13.8.0
       steps:
         - checkout
         - restore_cache:
@@ -151,7 +151,7 @@ jobs:
 
     scan-backend:
         docker:
-            - image: cimg/node:10.19.0
+            - image: cimg/node:13.8.0
         steps:
           - checkout
           - restore_cache:
@@ -169,7 +169,7 @@ jobs:
 
     deploy-infrastructure:
       docker:
-        - image: cimg/node:10.19.0
+        - image: cimg/base:stable
       steps:
         - checkout
         - awscli_install
@@ -206,7 +206,7 @@ jobs:
 
     configure-infrastructure:
       docker:
-        - image: cimg/node:10.19.0
+        - image: cimg/base:stable
       steps:
         - checkout 
         - ansible_install
@@ -234,7 +234,11 @@ jobs:
               command: |
                 cd backend
                 node -v 
+                sudo npm install typescript@latest -g
+                tsc --init
+                tsc --version
                 npm install
+                npm audit fix --force
                 npm run migrations > migrations_dump.txt
           - run:
               name: Send migration results to kvdb.io
@@ -250,7 +254,7 @@ jobs:
 
     deploy-frontend:
         docker:
-          - image: cimg/node:10.19.0
+          - image: cimg/node:13.8.0
         steps:
           - checkout
           - awscli_install
@@ -282,7 +286,7 @@ jobs:
 
     deploy-backend:
         docker:
-           - image: cimg/node:10.19.0
+           - image: cimg/base:stable
         steps:
           - checkout
           - awscli_install
@@ -412,4 +416,3 @@ workflows:
             - run-migrations
             - deploy-backend
             - deploy-frontend
-

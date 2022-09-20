@@ -341,7 +341,7 @@ jobs:
           - destroy-environment
           - revert-migrations   
    
-    smoke-test:
+    smoke-backend-test:
         docker:
           - image: cimg/base:stable
         steps:
@@ -363,9 +363,6 @@ jobs:
                   else
                     exit http://${BACKEND_PUBLIC_IP}:3030
                   fi
-
-
-
 
 
     smoke-frontend-test:
@@ -449,12 +446,14 @@ workflows:
           requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]   
-      - smoke-test:
+      - smoke-backend-test:
           requires: [deploy-backend]
       - smoke-frontend-test:
           requires: [deploy-frontend]       
       - cloudfront-update:
-          requires: [smoke-test,smoke-frontend-test]    
+          requires: [smoke-backend-test,smoke-frontend-test]    
+      - cleanup:
+          requires: [cloudfront-update]    
       - notify_on_success:
           requires:
             - build-frontend

@@ -365,9 +365,7 @@ jobs:
                     echo "Contents  of the inventory.txt file is -------"
                     sudo cat inventory.txt
                     ansible-playbook -i inventory.txt deploy-backend.yml
-
-        - run: cat .circleci/ansible/inventory.txt
-
+                    
         - run: ls -A1
         - run: pwd
         - run:

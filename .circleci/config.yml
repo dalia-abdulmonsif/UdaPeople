@@ -309,7 +309,7 @@ jobs:
 
     deploy-backend:
       docker:
-        - image: sleavely/node-awscli:14.x
+        - image: cimg/base:stable
           environment:
             NODE_ENV: "production"
             VERSION: "1"

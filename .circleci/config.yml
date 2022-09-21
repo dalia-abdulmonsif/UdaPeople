@@ -341,7 +341,6 @@ jobs:
             name: Install dependencies
             command: |
                     cd backend
-                    sudo chown -R ubuntu:ubuntu  /usr/local/lib/node_modules
                     npm install typescript@latest -g
                     npm install
 
@@ -363,7 +362,8 @@ jobs:
 
         - run:
               name: Deploy Our backend
-              command: |
+              command: |                    
+                    sudo chown -R ubuntu:ubuntu  /usr/local/lib/node_modules
                     cd backend
                     npm i
                     npm run build

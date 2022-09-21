@@ -422,14 +422,14 @@ jobs:
             fi
 
 
-  notify_on_success:
-    docker:
-      - image: 'cimg/base:stable'
-    steps:
-      - slack/notify:
-          event: pass
-          channel: cicd-pipelines
-          template: success_tagged_deployment_1        
+  # notify_on_success:
+  #   docker:
+  #     - image: 'cimg/base:stable'
+  #   steps:
+  #     - slack/notify:
+  #         event: pass
+  #         channel: cicd-pipelines
+  #         template: success_tagged_deployment_1        
             
 workflows:
   default:
@@ -463,17 +463,17 @@ workflows:
           requires: [smoke-test]    
       - cleanup:
           requires: [cloudfront-update]    
-      - notify_on_success:
-          requires:
-            - build-frontend
-            - build-backend
-            - test-frontend
-            - test-backend     
-            - deploy-infrastructure  
-            - configure-infrastructure             
-            - run-migrations
-            - deploy-backend
-            - deploy-frontend
+      # - notify_on_success:
+      #     requires:
+      #       - build-frontend
+      #       - build-backend
+      #       - test-frontend
+      #       - test-backend     
+      #       - deploy-infrastructure  
+      #       - configure-infrastructure             
+      #       - run-migrations
+      #       - deploy-backend
+      #       - deploy-frontend
 
 
 

@@ -286,12 +286,15 @@ jobs:
           - run:
               name: Get backend
               command: |
-                  BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+
+                 BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
                   --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID}" \
                   --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
-                  export API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-                  cat frontend/.env
-                  echo "http://${BACKEND_IP}:3030"
+                  export API_URL="http://${BACKEND_PUBLIC_IP}:3030" 
+                  touch .env
+                  echo "http://${BACKEND_PUBLIC_IP}:3030"  >> .env
+                  sudo cat frontend/.env
+                  
           - run:
               name: Deploy frontend objects
               command: |
@@ -382,7 +385,7 @@ jobs:
                   else
                     exit 1
                   fi
-
+              no_output_timeout: 30m
 
     smoke-frontend-test:
         docker:

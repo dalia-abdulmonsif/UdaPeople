@@ -226,7 +226,7 @@ jobs:
       - checkout       
       # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["8d:3e:53:3f:96:70:3d:53:80:e4:eb:08:23:19:9e:8f"]
+          fingerprints: ["93:63:db:c0:1b:e9:19:aa:72:7a:60:58:de:0e:f2:cb"]
       # attach workspace
       - attach_workspace:
           at: ~/
@@ -280,11 +280,8 @@ jobs:
           name: Send migration status to kvdb.io
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            then
-                # If you are using memstash.io, generate the token "7933fe63-4687-4fa1-8426-aa25aa1730ec" on the website
-                # curl -H "Content-Type: text/plain" -H "token: 7933fe63-4687-4fa1-8426-aa25aa1730ec" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
-                # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-                curl https://kvdb.io/${KVDB_BUCKET_ID}/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+                then
+                  curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID} -d '1'
             fi
       - destroy-environment
       - revert-migrations   

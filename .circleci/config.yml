@@ -271,7 +271,7 @@ jobs:
 
     deploy-frontend:
         docker:
-          - image: cimg/base:stable
+         - image: cimg/node:13.8.0
         steps:
           - checkout
           - awscli_install
@@ -341,6 +341,7 @@ jobs:
             name: Install dependencies
             command: |
                     cd backend
+                    npm install typescript@latest -g
                     npm install
 
         - run:

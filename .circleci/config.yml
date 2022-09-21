@@ -217,7 +217,7 @@ jobs:
             root: ~/
             paths:
               - project/.circleci/ansible/inventory.txt
-        - destroy-environment
+        # - destroy-environment
 
 
     configure-infrastructure:
@@ -236,7 +236,7 @@ jobs:
                cd .circleci/ansible
                cat inventory.txt
                ansible-playbook -i inventory.txt configure-server.yml                         
-        - destroy-environment
+        # - destroy-environment
 
 
     run-migrations:
@@ -264,7 +264,7 @@ jobs:
                 then
                   curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID} -d '1'
                 fi
-          - destroy-environment
+          # - destroy-environment
           - revert-migrations    
 
  #KL48reMyYUBPYTrg4gYseg
@@ -303,7 +303,7 @@ jobs:
                 npm run build
                 aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
     
-          - destroy-environment
+          # - destroy-environment
           - revert-migrations                 
 
 
@@ -377,7 +377,7 @@ jobs:
                     cat inventory.txt
                     ansible-playbook -i inventory.txt deploy-backend.yml
 
-        - destroy-environment
+        # - destroy-environment
         - revert-migrations
    
     smoke-backend-test:
@@ -451,7 +451,7 @@ jobs:
                   --template-file .circleci/files/cloudfront.yml \
                   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}" \
                   --stack-name InitialStack
-          - destroy-environment
+          # - destroy-environment
           - revert-migrations
 
 

@@ -90,15 +90,11 @@ jobs:
 
   test-frontend:
     docker:
-      # Docker image here
       - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           keys: [frontend-build]
-      # Your job code here
       - run:
           name: Test front-end
           command: |
@@ -108,15 +104,11 @@ jobs:
                 
   test-backend:
     docker:
-      # Docker image here
       - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           keys: [backend-build]
-      # Your job code here
       - run:
           name: Test back-end
           command: |
@@ -126,15 +118,11 @@ jobs:
             
   scan-frontend:
     docker:
-      # Docker image here
       - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           keys: [frontend-build]
-      # Your job code here
       - run:
           name: Scan front-end
           command: |
@@ -149,15 +137,11 @@ jobs:
           
   scan-backend:
     docker:
-      # Docker image here
       - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           keys: [backend-build]
-      # Your job code here
       - run:
           name: Scan back-end
           command: |
@@ -210,16 +194,11 @@ jobs:
 
   configure-infrastructure:
     docker:
-      # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
-#      - image: python:3.8-alpine3.15      
+      - image: python:3.7-alpine3.11  
     steps:
-      # Checkout code from git
       - checkout       
-      # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: ["93:63:db:c0:1b:e9:19:aa:72:7a:60:58:de:0e:f2:cb"]
-      # attach workspace
       - attach_workspace:
           at: ~/
 
@@ -228,12 +207,6 @@ jobs:
           command: |
               apk add --update tar gzip ansible
               pip install awscli
-#              pip install --upgrade pip
-#              pip install ansible
-#              pip install awscli
-#            apk update && apk add --no-cache musl-dev libffi-dev openssl-dev make gcc python py2-pip python-dev
-#            pip install --upgrade pip
-#            pip install cffi
       - run:
           name: Configure server
           command: |
@@ -257,10 +230,8 @@ jobs:
 
   run-migrations:
     docker:
-      # Docker image here that supports NodeJS
         - image: circleci/node:13.8.0
     steps:
-      # Checkout code from git
       - checkout
       - run:
           name: Run migrations
@@ -280,32 +251,15 @@ jobs:
 
   deploy-frontend:
     docker:
-      # Docker image here that supports AWS CLI
       - image: amazon/aws-cli
     steps:
-      # Checkout code from git
       - checkout
-
-
       - run:
           name: Install dependencies
           command: |
             yum install -y tar gzip curl
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs              
-      # - run:
-      #     name: Install node
-      #     command: |
-      #       curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-      #       export NVM_DIR="$HOME/.nvm"
-      #       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-      #       nvm install 16
-
-      # - run:
-      #     name: Install ansible and awscli
-      #     command: |
-      #       pip3 install ansible
-      #       pip3 install awscli
 
       - run:
           name: Get backend url
@@ -330,25 +284,19 @@ jobs:
             npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure      
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive   
       - revert-migrations
       - destroy-environment     
                     
   deploy-backend:
     docker:
-      # Docker image here that supports Ansible
       - image: cimg/python:3.7-node
     steps:
-      # Checkout code from git
       - checkout       
-      # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints: 'cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e'
-      # attach workspace
       - attach_workspace:
           at: ~/
-
       - run:
           name: Install aws dependencies
           command: |
@@ -362,7 +310,6 @@ jobs:
             sudo apt install software-properties-common -y
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
-#              pip install --upgrade
       - run:
           name: Deploy backend
           command: |
@@ -379,7 +326,6 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml -v
-      # Here's where you will add some code to rollback on failure  
       - revert-migrations
       - destroy-environment     
 
@@ -387,11 +333,6 @@ jobs:
     docker:
       - image: cimg/node:13.8.0
     steps:
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum -y install jq tar gzip git curl
-      # - install_awscli
       - run:
           name: Install AWS CLI 
           command: |

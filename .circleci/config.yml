@@ -310,7 +310,7 @@ jobs:
 
     deploy-backend:
       docker:
-        - image: cimg/node:13.8.0
+        - image: cimg/base:2022.06
       steps:
         - checkout
         - awscli_install

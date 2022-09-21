@@ -327,6 +327,7 @@ jobs:
             command: |
               cd backend
               npm install
+              sudo chown -R www-data:www-data /usr/local/lib/node_modules  2> /dev/null
         - run:
             name: Package Backend
             command: |

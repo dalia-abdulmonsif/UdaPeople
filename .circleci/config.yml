@@ -173,16 +173,9 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      # Docker image here that supports AWS CLI
       - image: amazon/aws-cli
     steps:
-      # Checkout code from git
       - checkout
-      # - run: 
-      #     name: set/override default region 
-      #     command: | 
-      #         aws configure set default.region "us-west-2"
-      #         echo $(aws configure list)
       - run:
           name: Install tar and zip utilities
           command: |
@@ -213,7 +206,6 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure 
       - destroy-environment     
 
   configure-infrastructure:

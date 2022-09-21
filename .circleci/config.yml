@@ -416,6 +416,16 @@ jobs:
             else
               echo "=======================Didn't delete========================"            
             fi
+
+
+  notify_on_success:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - slack/notify:
+          event: pass
+          channel: cicd-pipelines
+          template: success_tagged_deployment_1        
             
 workflows:
   default:
@@ -909,12 +919,5 @@ workflows:
 #                         aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
 #                       fi
 
-#     notify_on_success:
-#         docker:
-#           - image: cimg/base:stable
-#         steps:
-#           - slack/notify:
-#               event: pass
-#               channel: cicd-pipelines
-#               template: success_tagged_deployment_1
+
     

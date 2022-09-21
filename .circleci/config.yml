@@ -323,6 +323,12 @@ jobs:
               keys: [backend-deps]
 
         - run:
+            name: Install dependencies
+            command: |
+                    cd backend
+                    npm install
+
+        - run:
             name: Create the  .env file
             command: |
                     cd backend
@@ -344,17 +350,28 @@ jobs:
                     cd backend
                     npm i
                     npm run build
-                    cd ..
                     # enter backend directory and Zip the directory
-                    tar -C backend -czf artifact.tar.gz .
-                    cp artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
+
+                    tar -czf artifact.tar.gz dist/* package*
+                    cd ..
+
+                    cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
                     # ls ~/project/.circleci/ansible/roles/deploy/files/
                     echo "Present working directory is -------"
                     cd .circleci/ansible
                     echo "Contents  of the inventory.txt file is -------"
                     sudo cat inventory.txt
                     ansible-playbook -i inventory.txt deploy-backend.yml
-              no_output_timeout: 30m
+
+        - run:
+              name: Deploy backend
+              command: |
+                    export TYPEORM_MIGRATIONS_DIR=./migrations
+                    export TYPEORM_ENTITIES='./modules/domain/**/*.entity{.ts,.js}'
+                    export TYPEORM_MIGRATIONS=./migrations/*.ts
+                    cd .circleci/ansible
+                    cat inventory.txt
+                    ansible-playbook -i inventory.txt deploy-backend.yml
 
         - destroy-environment
         - revert-migrations

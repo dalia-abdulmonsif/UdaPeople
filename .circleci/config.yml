@@ -311,20 +311,6 @@ jobs:
     deploy-backend:
       docker:
         - image: cimg/base:stable
-          environment:
-            NODE_ENV: "production"
-            VERSION: "1"
-            ENVIRONMENT: "production"
-            TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-            TYPEORM_HOST: $TYPEORM_HOST
-            TYPEORM_USERNAME: $TYPEORM_USERNAME
-            TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-            TYPEORM_DATABASE: $TYPEORM_DATABASE
-            TYPEORM_PORT: $TYPEORM_PORT
-            TYPEORM_MIGRATIONS_DIR: "./migrations"
-            TYPEORM_ENTITIES: "./modules/domain/**/*.entity{.ts,.js}"
-            TYPEORM_MIGRATIONS: "./migrations/*.ts"
-
       steps:
         - checkout
         - awscli_install
@@ -333,70 +319,35 @@ jobs:
         - add_ssh_keys:
               fingerprints: ["93:63:db:c0:1b:e9:19:aa:72:7a:60:58:de:0e:f2:cb"]
         - attach_workspace:
-              at: ~/
+          at: ~/
         - restore_cache:
-              keys: [backend-deps]
-
+            keys: [backend-deps]
         - run:
             name: Install dependencies
             command: |
-                    cd backend
-                    sudo chown -R www-data:www-data /usr/local/lib/node_modules 2> /dev/null
-                    sudo npm install typescript@latest -g
-                    sudo npm install
-
+              cd backend
+              npm install
         - run:
-            name: Create the  .env file
+            name: Package Backend
             command: |
-                    cd backend
-                    touch .env
-                    echo "TYPEORM_HOST=${TYPEORM_HOST}"  >> .env
-                    echo "TYPEORM_PORT=${TYPEORM_PORT}" >> .env
-                    echo "TYPEORM_USERNAME=${TYPEORM_USERNAME}" >> .env
-                    echo "TYPEORM_PASSWORD=${TYPEORM_PASSWORD}" >> .env
-                    echo "TYPEORM_DATABASE=${TYPEORM_DATABASE}" >> .env
-                    echo "TYPEORM_CONNECTION=postgres" >> .env
-                    echo "TYPEORM_MIGRATIONS_DIR=./migrations" >> .env
-                    echo "TYPEORM_ENTITIES=./modules/domain/**/*.entity.ts" >> .env
-                    echo "TYPEORM_MIGRATIONS=./migrations/*.ts" >> .env
-                    cat .env
-
+              cd backend
+              npm run build
+              tar -czf artifact.tar.gz dist/* package*
+              cd ..
+              cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
         - run:
-              name: Deploy Our backend
-              command: |                    
-                    sudo chown -R www-data:www-data /usr/local/lib/node_modules  2> /dev/null
-                    cd backend
-                    npm i
-                    npm run build
-                    # enter backend directory and Zip the directory
-
-                    tar -czf artifact.tar.gz dist/* package*
-                    cd ..
-
-                    cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-                    ls backend
-                    find . -type f -name '*.env' | wc -l
-                    echo "the PWD is : ${pwd}"
-                    echo "Present working directory is -------"
-                    cd .circleci/ansible
-                    echo "Contents  of the inventory.txt file is -------"
-                    sudo cat inventory.txt
-                    ansible-playbook -i inventory.txt deploy-backend.yml
-
+            name: Deploy backend
+            command: |
+              export TYPEORM_MIGRATIONS_DIR=./migrations
+              export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+              export TYPEORM_MIGRATIONS=./migrations/*.ts
+              cd .circleci/ansible
+              cat inventory.txt
+              ansible-playbook -i inventory.txt deploy-backend.yml
         - run: ls -A1
         - run: pwd
-        - run:
-              name: Deploy backend
-              command: |
-                    export TYPEORM_MIGRATIONS_DIR=./migrations
-                    export TYPEORM_ENTITIES='./modules/domain/**/*.entity{.ts,.js}'
-                    export TYPEORM_MIGRATIONS=./migrations/*.ts
-                    cd .circleci/ansible
-                    cat inventory.txt
-                    ansible-playbook -i inventory.txt deploy-backend.yml
-
         # - destroy-environment
-        - revert-migrations
+        # - revert-migrations
    
     smoke-backend-test:
         docker:

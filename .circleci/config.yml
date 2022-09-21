@@ -307,14 +307,48 @@ jobs:
           - revert-migrations                 
 
 
+    deploy-backend-infrastructure:
+          docker:
+            - image: cimg/base:stable
+          steps:
+            - checkout
+            - awscli_install
+            - ansible_install
+            - add_ssh_keys:
+                  fingerprints: ["93:63:db:c0:1b:e9:19:aa:72:7a:60:58:de:0e:f2:cb"]
+            - attach_workspace:
+                at: ~/
+            - restore_cache:
+                keys: [backend-deps]
+            - run:
+                name: Package Backend
+                command: |
+                  cd backend
+                  npm run build
+                  tar -czf artifact.tar.gz dist/* package*
+                  cd ..
+                  cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            - run:
+                name: Deploy backend
+                command: |
+                  export TYPEORM_MIGRATIONS_DIR=./migrations
+                  export TYPEORM_ENTITIES='./modules/domain/**/*.entity{.ts,.js}'
+                  export TYPEORM_MIGRATIONS='./migrations/*{.ts,.js}'
+                  cd .circleci/ansible
+                  cat inventory.txt
+                  ansible-playbook -i inventory.txt deploy-backend.yml
+            - save_cache:
+                paths: [backend/node_modules]
+                key: backend-deps
+            - notify_on_failure
+
+
 
     deploy-backend:
       docker:
-        - image: cimg/base:2022.06
+        - image: cimg/node:10.19.0
       steps:
         - checkout
-        - awscli_install
-        - ansible_install
         - install_nodejs
         - add_ssh_keys:
               fingerprints: ["93:63:db:c0:1b:e9:19:aa:72:7a:60:58:de:0e:f2:cb"]
@@ -330,26 +364,18 @@ jobs:
               npm audit fix --force
               sudo chown -R www-data:www-data /usr/local/lib/node_modules  2> /dev/null
         - run:
-            name: Package Backend
-            command: |
-              cd backend
-              npm run build
-              tar -czf artifact.tar.gz dist/* package*
-              cd ..
-              cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-        - run:
-            name: Deploy backend
-            command: |
-              export TYPEORM_MIGRATIONS_DIR=./migrations
-              export TYPEORM_ENTITIES='./modules/domain/**/*.entity{.ts,.js}'
-              export TYPEORM_MIGRATIONS='./migrations/*{.ts,.js}'
-              cd .circleci/ansible
-              cat inventory.txt
-              ansible-playbook -i inventory.txt deploy-backend.yml
+            name: Back-end build   
+            command: | 
+                cd backend
+                npm install 
+                npm run build    
+
         - run: ls -A1
         - run: pwd
         # - destroy-environment
         # - revert-migrations
+ 
+
    
     smoke-backend-test:
         docker:
@@ -482,8 +508,10 @@ workflows:
           requires: [configure-infrastructure]    
       - deploy-frontend:
           requires: [run-migrations]
+      - deploy-backend-infrastructure:
+          requires: [run-migrations] 
       - deploy-backend:
-          requires: [run-migrations]   
+          requires: [deploy-backend-infrastructure]   
       - smoke-backend-test:
           requires: [deploy-backend]
       - smoke-frontend-test:

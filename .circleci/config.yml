@@ -294,7 +294,7 @@ jobs:
                   cd frontend
                   touch .env
                   echo "http://${BACKEND_PUBLIC_IP}:3030"  >> .env
-                  sudo cat frontend/.env
+                  sudo cat .env
                   
           - run:
               name: Deploy frontend objects

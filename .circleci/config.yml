@@ -311,7 +311,6 @@ jobs:
     deploy-backend:
       docker:
         - image: cimg/base:stable
-<<<<<<< HEAD
           environment:
             NODE_ENV: "production"
             VERSION: "1"
@@ -325,8 +324,7 @@ jobs:
             TYPEORM_MIGRATIONS_DIR: "./migrations"
             TYPEORM_ENTITIES: "./modules/domain/**/*.entity{.ts,.js}"
             TYPEORM_MIGRATIONS: "./migrations/*.ts"
-=======
->>>>>>> 87fb79bb28aa8a47097aa1b33c3f54ad4d962662
+
       steps:
         - checkout
         - awscli_install

@@ -355,7 +355,7 @@ jobs:
                     echo "TYPEORM_MIGRATIONS_DIR=./migrations" >> .env
                     echo "TYPEORM_ENTITIES=./modules/domain/**/*.entity.ts" >> .env
                     echo "TYPEORM_MIGRATIONS=./migrations/*.ts" >> .env
-                    sudo cat .env
+                    cat .env
 
         - run:
               name: Deploy Our backend

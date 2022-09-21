@@ -341,8 +341,9 @@ jobs:
             name: Install dependencies
             command: |
                     cd backend
-                    npm install typescript@latest -g
-                    npm install
+                    sudo chown -R ubuntu:ubuntu  /usr/local/lib/node_modules
+                    sudo npm install typescript@latest -g
+                    sudo npm install
 
         - run:
             name: Create the  .env file

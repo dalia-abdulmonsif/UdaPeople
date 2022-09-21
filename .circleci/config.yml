@@ -358,6 +358,7 @@ jobs:
                     cp backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
                     ls backend
                     find . -type f -name '*.env' | wc -l
+                    echo "the PWD is : ${pwd}"
                     echo "Present working directory is -------"
                     cd .circleci/ansible
                     echo "Contents  of the inventory.txt file is -------"

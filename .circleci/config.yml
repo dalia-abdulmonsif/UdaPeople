@@ -291,6 +291,7 @@ jobs:
                   --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID}" \
                   --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
                   export API_URL="http://${BACKEND_PUBLIC_IP}:3030" 
+                  cd frontend
                   touch .env
                   echo "http://${BACKEND_PUBLIC_IP}:3030"  >> .env
                   sudo cat frontend/.env

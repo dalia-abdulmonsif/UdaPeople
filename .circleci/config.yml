@@ -400,7 +400,8 @@ jobs:
                   --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
                   
                   export API_URL=http://${BACKEND_PUBLIC_IP}:3030
-                  cat curl -s $API_URL/api/status;                  
+                  
+                  echo $(curl -s $API_URL/api/status)                  
 
                   if curl -s $API_URL/api/status | grep "ok"
                   then

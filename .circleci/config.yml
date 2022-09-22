@@ -221,7 +221,7 @@ jobs:
           name: Configure Server
           command: |
             cd .circleci/ansible
-            cat inventory.txt
+            cat inventory.txt 
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
 
@@ -288,15 +288,29 @@ jobs:
       - destroy-environment
       - revert-migrations
 
-  deploy-backend:
-    environment:
-      - ANSIBLE_HOST_KEY_CHECKING: False
+  deploy-backend:    
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
+    environment:
+         NODE_ENV: "production"
+         VERSION: "1"
+         ENVIRONMENT: "production"
+         TYPEORM_CONNECTION: $TYPEORM_CONNECTION
+         TYPEORM_HOST: $TYPEORM_HOST
+         TYPEORM_USERNAME: $TYPEORM_USERNAME
+         TYPEORM_PASSWORD: $TYPEORM_PASSWORD
+         TYPEORM_DATABASE: $TYPEORM_DATABASE
+         TYPEORM_PORT: $TYPEORM_PORT
+         TYPEORM_MIGRATIONS_DIR: "./migrations"
+         TYPEORM_ENTITIES: "./modules/domain/**/*.entity{.ts,.js}"
+         TYPEORM_MIGRATIONS: "./migrations/*.ts"
     steps:
       - checkout
+      - install_awscli
+      - install_ansible
+      - install_nodejs
       - add_ssh_keys:
-          fingerprints: ["cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"]
+          fingerprints: ["3d:b0:37:65:e9:fb:00:bb:1d:ae:8a:97:0c:22:e3:5a"]
       - attach_workspace:
           at: ~/
       - restore_cache:
@@ -304,33 +318,26 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apt update -y &&  apt install -y wget
-            apt install curl
-            apt install nodejs
-            apt install openssh
-            apt install tar gzip
+            sudo apt -y install tar gzip curl
+      - run:
+          name: Package backend
+          command: |
             cd backend
             npm install
-
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            cp artifact.tar.gz .circleci/ansible/roles/deploy/files      
       - run:
           name: Deploy backend
           command: |
             export TYPEORM_MIGRATIONS_DIR=./migrations
             export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-            export TYPEORM_MIGRATIONS=./migrations/*{.ts,.js}
-
-            cd backend
-            npm i
-            npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
-            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-            mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
+            
             cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml -vvv
+            ansible-playbook -i inventory.txt deploy-backend.yml
 
       - destroy-environment
       - revert-migrations

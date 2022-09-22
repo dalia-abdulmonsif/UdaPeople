@@ -30,7 +30,7 @@
   shell: |
     sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu"
     pm2 save
-    
+
 - name: 'update and upgrade packages.'
   become: yes
   apt:
@@ -41,12 +41,7 @@
   become: yes
   apt:
     autoremove: yes
-- name: install deps
-  become: yes
-  apt:
-    name: ['nodejs', 'npm']
-    state: latest
-    update_cache: yes
+    
 - name: install pm2
   become: yes
   npm:

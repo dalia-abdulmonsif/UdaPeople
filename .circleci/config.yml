@@ -309,6 +309,7 @@ jobs:
           command: |
             cd backend
             npm install
+            apk add --update ansible nodejs npm openssh tar gzip
       - run:
           name: Deploy backend
           command: |

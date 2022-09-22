@@ -36,7 +36,7 @@
       become: true
       apt:
         name: python3
-        state: latest
+        state: stable
       
   # environment
   #   NODE_ENV: production

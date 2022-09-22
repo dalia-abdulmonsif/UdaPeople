@@ -305,10 +305,10 @@ jobs:
           name: Install dependencies
           command: |
             apt-get update -y &&  apt-get install -y wget
-            sudo apt-get install curl
-            sudo apt-get nodejs
-            sudo apt-get openssh
-            sudo apt-get tar gzip
+            sudo apt install curl
+            sudo apt nodejs
+            sudo apt openssh
+            sudo apt tar gzip
             cd backend
             npm install
 

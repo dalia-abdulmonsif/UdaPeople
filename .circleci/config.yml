@@ -289,27 +289,11 @@ jobs:
       - revert-migrations
   deploy-backend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: cimg/base:stable
     steps:
       - checkout
-      - run:
-          name: Install AWS CLI v2
-          command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-      - run:
-          name: Install Ansible
-          command: |
-            sudo apt update
-            sudo apt install software-properties-common -y
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
-      - run:
-          name: Install Node.js 13
-          command: |
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-            sudo apt install -y nodejs
+      - install_awscli
+      - install_nodejs
       - add_ssh_keys:
           fingerprints: ["cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"]
       - attach_workspace:

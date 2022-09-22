@@ -295,9 +295,6 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - install_awscli
-      - install_ansible
-      - install_nodejs
       - add_ssh_keys:
           fingerprints: ["cf:d2:7b:a8:ef:e4:77:6d:ab:38:ef:f2:5d:33:72:6e"]
       - attach_workspace:
@@ -309,7 +306,8 @@ jobs:
           command: |
             cd backend
             npm install
-            apk add --update ansible nodejs npm openssh tar gzip
+            sudo apt-get install curl
+
       - run:
           name: Deploy backend
           command: |

@@ -228,13 +228,12 @@ jobs:
   run-migrations:
     docker:
       - image: cimg/node:13.8.0
-    steps:
+    steps:  
       - checkout
       - awscli_install
       - restore_cache:
           keys:
             - backend-deps
-
       - run:
           name: Run migrations
           command: |
@@ -249,6 +248,8 @@ jobs:
             then
               curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID} -d '1'
             fi
+      - destroy-environment
+      - revert-migrations   
       - destroy-environment
       - revert-migrations   
 

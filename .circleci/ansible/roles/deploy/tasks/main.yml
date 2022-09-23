@@ -13,17 +13,23 @@
   shell: |
     cd /home/ubuntu/backend
     npm install
+
 - name: "Executing node app with pm2 "
   become: true
   shell: |
     cd /home/ubuntu/backend/dist
     pm2 stop default
     pm2 start -f main.js 
-  register: execute_node
 
-- name: "print message"
-  debug:
-    msg: "{{ execute_node_stdout_lines }}"
+- name: "Installing net tools "
+  become: true
+  shell: |
+    sudo apt install net-tools
+
+- name: "checking port 3030 "
+  become: true
+  shell: |
+    sudo netstat -nltp | grep 3030
 
 - name: "configure pm2 to start as a service"
   shell: |

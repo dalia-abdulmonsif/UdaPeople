@@ -1,5 +1,5 @@
 Public Url to GitHub repository (not private) [URL01]
-  https://github.com/dalia-abdulmonsif/UdaPeople
+  https://github.com/dalia-abdulmonsif/UdaPeople/tree/master
 
 Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
  http://udapeople-70b2fa2.s3-website-us-east-1.amazonaws.com/

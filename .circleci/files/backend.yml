@@ -45,3 +45,11 @@ Resources:
     Properties:
       Domain: vpc
       InstanceId: !Ref EC2Instance
+
+
+      global:
+   scrape_interval:15s
+   external_labels:
+     monitor:'prometheus'
+
+
